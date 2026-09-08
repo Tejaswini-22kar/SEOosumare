@@ -13,9 +13,7 @@ const TermsAndConditions = () => {
             These terms govern your use of this website and your participation in journeys, retreats and programs operated by Soltale Potential Exploration Pvt Ltd, Flat 8, Puja Apt, S No 95, Plot No 50, Paud Road, Bhusari Colony, Pune City, Pune – 411038, Maharashtra, India (“SoulTales”, “we”, “us”). By using this website or confirming a booking, you accept them.
 We’ve written these in plain English on purpose. They are still a contract. <br />
 Last updated: July 2026
-          </p>
-
-           
+          </p> 
 
         </div>
      
