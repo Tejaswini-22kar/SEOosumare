@@ -27,8 +27,11 @@ const SLIDE_DURATION = 10000;
 function HeroSlide({ slide, active }) {
   return (
     <div
+      aria-hidden={!active}
       className={
-        "absolute inset-0 overflow-hidden transition-opacity duration-1000 ease-in-out " +
+        // All slides share ONE grid cell (col-start-1 row-start-1), so the
+        // section grows to fit the tallest slide instead of clipping content.
+        "relative col-start-1 row-start-1 flex overflow-hidden transition-opacity duration-1000 ease-in-out " +
         (active ? "opacity-100" : "pointer-events-none opacity-0")
       }
     >
@@ -50,28 +53,32 @@ function HeroSlide({ slide, active }) {
 
       <div
         className={
-          "relative z-10 grid h-full grid-cols-1 items-center   px-6 py-16 sm:px-10 md:px-16 lg:px-36 " +
+          "relative z-10 grid w-full grid-cols-1 items-center gap-10 " +
+          // extra bottom padding keeps content clear of the nav dots
+          "px-5 pb-24 pt-20 sm:px-10 md:px-16 lg:gap-12 lg:px-20 lg:py-16 xl:px-36 " +
           (slide.colVideo ? "lg:grid-cols-2" : "lg:grid-cols-1")
         }
       >
         {/* Left: copy */}
-        <div className="max-w-xl">
-          <h1 className="font-[Poppins] text-3xl font-extrabold  text-white sm:text-4xl !leading-[60px] lg:text-[2.75rem]">
+        <div className="w-full max-w-xl">
+          <h1 className="font-[Poppins] text-[1.75rem] font-extrabold text-white !leading-[1.3] sm:text-4xl lg:text-[2.75rem] lg:!leading-[60px]">
             <span>{slide.headline[0]}</span>
-            <br />
+            {/* Line break only from sm up; on phones the headline wraps naturally */}
+            <br className="hidden sm:block" />
+            <span className="sm:hidden"> </span>
             <span>{slide.headline[1]}</span>
             <span className="text-[#E8623E]">{slide.headline[2]}</span>
             <span>{slide.headline[3]}</span>
           </h1>
 
-          <p className="mt-9 font-[Inter] text-sm font-light leading-relaxed text-white/60 sm:text-base">
+          <p className="mt-6 font-[Inter] text-sm font-light leading-relaxed text-white/60 sm:mt-9 sm:text-base">
             {slide.body}
           </p>
 
-          <div className="mt-9 flex flex-col font-[Inter] text-xs text-white/80 sm:flex-row sm:flex-wrap sm:gap-2 sm:text-sm">
+          <div className="mt-6 flex flex-col gap-2 font-[Inter] text-xs text-white/80 sm:mt-9 sm:flex-row sm:flex-wrap sm:gap-x-5 sm:text-sm">
             {slide.stats.map((stat) => (
               <span key={stat} className="flex items-center gap-1.5">
-                <Star className="h-3.5 w-3.5 fill-[#E8623E] text-[#E8623E]" />
+                <Star className="h-3.5 w-3.5 shrink-0 fill-[#E8623E] text-[#E8623E]" />
                 {stat}
               </span>
             ))}
@@ -79,17 +86,16 @@ function HeroSlide({ slide, active }) {
 
           <a
             href="#"
-            className="mt-9 inline-flex items-center gap-2 rounded-md bg-[#E8623E] px-6 py-3.5 font-[Inter] text-sm font-medium text-white transition-colors hover:bg-[#d6532f]"
+            className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md bg-[#E8623E] px-5 py-3.5 text-center font-[Inter] text-sm font-medium text-white transition-colors hover:bg-[#d6532f] sm:mt-9 sm:w-auto sm:px-6"
           >
             {slide.cta}
-            <ArrowRight className="h-4 w-4" />
+            <ArrowRight className="h-4 w-4 shrink-0" />
           </a>
         </div>
 
         {/* Right: column video, only for slides that define one */}
         {slide.colVideo && (
-          <div className="relative mx-auto w-full   ">
-             
+          <div className="relative mx-auto w-full max-w-xl lg:max-w-none">
             <div className="overflow-hidden rounded-xl shadow-2xl">
               <video
                 key={slide.colVideo}
@@ -97,7 +103,7 @@ function HeroSlide({ slide, active }) {
                 loop
                 muted
                 playsInline
-                className="h-full w-full object-cover"
+                className="block h-auto w-full object-cover"
                 src={slide.colVideo}
               />
             </div>
@@ -117,17 +123,19 @@ const HeroSlider = () => {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setIndex((prev) => (prev + 1) % SLIDES.length);
+      setIndex((prev) => (prev + 1) % SLIDES.length);//
     }, SLIDE_DURATION);
     return () => clearInterval(timer);
   }, []);
 
   return (
-    <section className="relative h-screen min-h-[560px] w-full overflow-hidden bg-[#161513]">
-      {/* ambient background glow, static across slides */}
+    // min-h instead of fixed h-screen: fills the viewport when content is short,
+    // grows when content is tall (phones). svh avoids the mobile URL-bar jump.
+    <section className="relative w-full overflow-hidden bg-[#161513]">
+      {/* ambient background glow, static across slides */}2
       <div className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_top_right,rgba(232,98,62,0.18),transparent_55%)]" />
 
-      <div className="relative mx-auto h-full ">
+      <div className="relative mx-auto grid min-h-[100svh] w-full">
         {SLIDES.map((slide, i) => (
           <HeroSlide key={i} slide={slide} active={i === index} />
         ))}
@@ -158,6 +166,9 @@ const HeroSlider = () => {
         @keyframes hero-progress {
           from { width: 0% }
           to { width: 100% }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          [style*="hero-progress"] { animation: none !important; width: 100%; }
         }
       `}</style>
     </section>

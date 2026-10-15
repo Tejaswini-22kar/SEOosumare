@@ -1,72 +1,70 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import logo from "../assets/osumarelogo.webp";
 
+// Each nav item points to the `id` of a section on the page.
+// IMPORTANT: change the `id` values below to match the ids you added.
+// (Only "seoservice" was known from your old code; the rest are guesses.)
 const NAV_ITEMS = [
-  "Home",
-  "Why Osumare",
-  "Our Approach",
-  "Our Services",
-  "SEO Challenges",
-  "Testimonials",
+  { label: "Home", id: "home" },
+  { label: "Our Approach", id: "our-approach" },
+  { label: "Why Osumare", id: "why-osumare" },
+  { label: "Our Process", id: "our-process" },
+  { label: "Our Services", id: "seoservice" },
+  
+  { label: "Testimonials", id: "testimonials" },
 ];
-
-const LogoMark = () => (
-  <svg viewBox="0 0 44 44" className="h-9 w-9 shrink-0 sm:h-10 sm:w-10">
-    <defs>
-      <linearGradient id="ring-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#F5C242" />
-        <stop offset="30%" stopColor="#E8544A" />
-        <stop offset="60%" stopColor="#6B5FA8" />
-        <stop offset="100%" stopColor="#3EC6C6" />
-      </linearGradient>
-    </defs>
-    <circle
-      cx="22"
-      cy="22"
-      r="17"
-      fill="none"
-      stroke="url(#ring-grad)"
-      strokeWidth="6"
-      strokeDasharray="88 20"
-      strokeLinecap="round"
-      transform="rotate(-90 22 22)"
-    />
-    <circle cx="22" cy="22" r="9" fill="#EFC64A" opacity="0.9" />
-  </svg>
-);
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [activeId, setActiveId] = useState(NAV_ITEMS[0].id);
+
+  // Highlight the nav link of whichever section is crossing the middle of the
+  // screen. Ids that don't exist on the page are simply skipped.
+  useEffect(() => {
+    const sections = NAV_ITEMS.map(({ id }) => document.getElementById(id)).filter(
+      Boolean
+    );
+    if (!sections.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) setActiveId(entry.target.id);
+        });
+      },
+      { rootMargin: "-40% 0px -55% 0px" }
+    );
+
+    sections.forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
+  }, []);
+
+  const handleNavClick = (id) => {
+    setActiveId(id);
+    setMenuOpen(false); // close the mobile menu after tapping a link
+  };
 
   return (
-    <header className="w-full bg-[#161513] px-4 py-3 sm:px-8 md:px-12 lg:px-16">
+    <header className="w-full bg-[#161513] px-4 py-3 sm:px-8 md:px-12 lg:px-20">
       <div className="mx-auto flex max-w-[1800px] items-center justify-between gap-6">
         {/* Logo */}
         <a href="#" className="flex shrink-0 items-center gap-2.5">
-          <LogoMark />
-          <span className="flex flex-col leading-none">
-            <span className="font-[Poppins] text-xl font-semibold tracking-tight text-white sm:text-2xl">
-              Osumare
-            </span>
-            <span className="mt-0.5 font-[Inter] text-[10px] font-light tracking-wide text-white/50">
-              Converge, Collaborate, Change
-            </span>
-          </span>
+          <img src={logo} alt="Osumare" className="w-36 h-16" />
         </a>
 
         {/* Desktop Navigation */}
-        <nav className="hidden items-center gap-8 lg:flex xl:gap-10">
-          {NAV_ITEMS.map((item, index) => (
+        <nav className="hidden items-center gap-8 lg:flex xl:gap-12">
+          {NAV_ITEMS.map(({ label, id }) => (
             <a
-              key={item}
-              href="#"
+              key={id}
+              href={`#${id}`}
+              onClick={() => handleNavClick(id)}
               className={
-                "whitespace-nowrap font-[Inter] text-[15px] transition-opacity hover:opacity-70 " +
-                (index === 0
-                  ? "font-medium text-[#E8623E]"
-                  : "font-normal text-white")
+                "whitespace-nowrap font-[Inter] text-base font-medium transition-opacity hover:opacity-70 " +
+                (activeId === id ? "text-[#FF8056]" : "text-[#E8E8EA]")
               }
             >
-              {item}
+              {label}
             </a>
           ))}
         </nav>
@@ -74,7 +72,7 @@ const Header = () => {
         {/* CTA (desktop) */}
         <a
           href="#"
-          className="hidden shrink-0 whitespace-nowrap rounded-md border border-[#E8623E] px-5 py-2.5 font-[Inter] text-sm font-medium text-[#E8623E] transition-colors hover:bg-[#E8623E] hover:text-white lg:block"
+          className="hidden shrink-0 whitespace-nowrap rounded-sm border border-[#FF8056] px-4 py-3 font-[Inter] text-sm font-medium text-[#FF8056] transition-colors hover:bg-[#E8623E] hover:text-white lg:block"
         >
           Get&nbsp;&nbsp;Free SEO Audit
         </a>
@@ -115,24 +113,25 @@ const Header = () => {
         }
       >
         <nav className="flex flex-col items-start gap-1 rounded-2xl border border-white/10 bg-black/30 px-6 py-6">
-          {NAV_ITEMS.map((item, index) => (
+          {NAV_ITEMS.map(({ label, id }) => (
             <a
-              key={item + "-mobile"}
-              href="#"
+              key={id + "-mobile"}
+              href={`#${id}`}
+              onClick={() => handleNavClick(id)}
               className={
                 "w-full py-2 font-[Inter] text-base transition-opacity hover:opacity-70 " +
-                (index === 0
+                (activeId === id
                   ? "font-medium text-[#E8623E]"
                   : "font-normal text-white")
               }
             >
-              {item}
+              {label}
             </a>
           ))}
 
           <a
             href="#"
-            className="mt-3 w-full rounded-md border border-[#E8623E] px-5 py-2.5 text-center font-[Inter] text-sm font-medium text-[#E8623E] transition-colors hover:bg-[#E8623E] hover:text-white"
+            className="mt-3 w-full rounded-sm border border-[#FF8056] px-4 py-3 text-center font-[Inter] text-sm font-medium text-[#FF8056] transition-colors hover:bg-[#E8623E] hover:text-white"
           >
             Get&nbsp;&nbsp;Free SEO Audit
           </a>

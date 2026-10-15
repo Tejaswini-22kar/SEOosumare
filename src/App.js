@@ -4,22 +4,20 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './Home';
 import Header from './commen/Header';
 import Footer from './commen/footer';
+import ThankYou from './commen/ThankYou'; // <-- new
 
 import PrivacyPolicy from './PrivacyPolicy';
 import TermsAndConditions from './Term&Condition';
-// import TermsAndConditions from './TermsAndConditions';
 
 function App() {
   return (
     <BrowserRouter>
-      
-
       <Routes>
         <Route
           path="/"
           element={
             <>
-            <Header />
+              <Header />
               <Home />
               <Footer />
             </>
@@ -45,6 +43,9 @@ function App() {
             </>
           }
         />
+
+        {/* New: standalone page, no Header/Footer */}
+        <Route path="/thank-you" element={<ThankYou />} />
       </Routes>
     </BrowserRouter>
   );
